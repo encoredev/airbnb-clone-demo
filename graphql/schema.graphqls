@@ -1,0 +1,17 @@
+type User {
+  id: ID!
+  email: String
+  displayName: String
+  pictureURL: String
+}
+
+type Listing {
+  id: ID!
+  title: String!
+  description: String!
+  host: User!
+}
+
+type Query {
+  listings: [Listing!]!
+}

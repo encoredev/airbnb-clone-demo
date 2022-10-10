@@ -3,6 +3,7 @@ package user
 import (
 	"context"
 
+	"encore.app/pkg/batching"
 	"encore.dev/beta/auth"
 	"encore.dev/storage/sqldb"
 )
@@ -18,18 +19,21 @@ type User struct {
 	PictureURL *string
 }
 
-// Get returns a user by their uid.
+// MultiGet returns a list of users.
 //
-//encore:api private path=/user/:uid
-func Get(ctx context.Context, uid string) (*User, error) {
-	var u User
-	err := sqldb.QueryRow(ctx, `
+//encore:api private method=GET path=/user/multi
+func MultiGet(ctx context.Context, p *batching.GetParams[auth.UID]) (*batching.Response[auth.UID, User], error) {
+	rows, err := batching.Query(ctx, `
 		SELECT id, email, display_name, picture_url
 		FROM users
-		WHERE id = $1
-	`, uid).Scan(&u.ID, &u.Email, &u.DisplayName, &u.PictureURL)
+		WHERE id
+	`, p)
 	if err != nil {
 		return nil, err
 	}
-	return &u, nil
+	return batching.FromRows(rows, func(r *sqldb.Rows) (auth.UID, User, error) {
+		var u User
+		err := rows.Scan(&u.ID, &u.Email, &u.DisplayName, &u.PictureURL)
+		return u.ID, u, err
+	})
 }
