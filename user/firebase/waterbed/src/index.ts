@@ -12,6 +12,10 @@ export const notifyBackend = functions
   })
   .auth.user()
   .beforeCreate(async (user) => {
+    if (user.disabled) {
+      throw new Error("user is disabled");
+    }
+
     const url = baseURL + "/user.BeforeCreateWebhook";
     await rp(url, {
       headers: {
@@ -24,7 +28,6 @@ export const notifyBackend = functions
           Email: user.email ?? "",
           DisplayName: user.displayName ?? "",
           PictureURL: user.photoURL ?? "",
-          Disabled: user.disabled,
         },
       }),
     });
