@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"encore.app/pkg/batching"
 	"encore.dev/beta/auth"
 )
 
@@ -59,4 +60,19 @@ func (s *Service) List(ctx context.Context) (*ListResponse, error) {
 		return nil, err
 	}
 	return &ListResponse{Listings: listings}, nil
+}
+
+// MultiGet returns a list of users.
+//
+//encore:api private method=GET path=/listing/multi
+func (s *Service) MultiGet(ctx context.Context, p *batching.GetParams[int64]) (*batching.Response[int64, Listing], error) {
+	var listings []Listing
+	if err := s.db.Find(&listings, p.IDs).Error; err != nil {
+		return nil, err
+	}
+	resp := batching.NewResponse[int64, Listing]()
+	for _, l := range listings {
+		resp.Records[l.ID] = l
+	}
+	return resp, nil
 }
