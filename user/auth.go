@@ -10,17 +10,6 @@ import (
 	"google.golang.org/api/option"
 )
 
-type User struct {
-	ID auth.UID
-	// Email is the user's email.
-	Email *string
-	// Name is the user's name.
-	DisplayName *string
-	// PictureURL is the user's picture URL.
-	PictureURL *string
-	Disabled   bool
-}
-
 //encore:authhandler
 func AuthHandler(ctx context.Context, token string) (auth.UID, *User, error) {
 	if err := setupFB(); err != nil {

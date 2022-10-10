@@ -24,10 +24,10 @@ func BeforeCreateWebhook(ctx context.Context, p *BeforeCreateWebhookParams) erro
 
 	u := p.User
 	_, err := sqldb.Exec(ctx, `
-		INSERT INTO "user" (id, email, display_name, picture_url, disabled)
-		VALUES ($1, $2, $3, $4, $5)
+		INSERT INTO users (id, email, display_name, picture_url)
+		VALUES ($1, $2, $3, $4)
 		ON CONFLICT (id) DO UPDATE
-		SET email = $2, display_name = $3, picture_url = $4, disabled = $5
-	`, u.ID, u.Email, u.DisplayName, u.PictureURL, u.Disabled)
+		SET email = $2, display_name = $3, picture_url = $4
+	`, u.ID, u.Email, u.DisplayName, u.PictureURL)
 	return err
 }

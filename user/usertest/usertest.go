@@ -27,15 +27,14 @@ func CreateUser(t *testing.T) (context.Context, *user.User) {
 		Email:       &email,
 		DisplayName: &name,
 		PictureURL:  nil,
-		Disabled:    true,
 	}
 
 	ctx := context.Background()
 
 	_, err := userDB.Exec(ctx, `
-		INSERT INTO "user" (id, email, display_name, picture_url, disabled)
-		VALUES ($1, $2, $3, $4, $5)
-	`, u.ID, u.Email, u.DisplayName, u.PictureURL, u.Disabled)
+		INSERT INTO users (id, email, display_name, picture_url)
+		VALUES ($1, $2, $3, $4)
+	`, u.ID, u.Email, u.DisplayName, u.PictureURL)
 	if err != nil {
 		t.Fatalf("unable to create test user: %v", err)
 	}
