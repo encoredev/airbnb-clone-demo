@@ -1,3 +1,3 @@
 {
-	"id": "encore-demo-zdk2",
+	"id": "airbnb-mkg2",
 }
