@@ -1,0 +1,11 @@
+CREATE TABLE listings (
+    id BIGSERIAL PRIMARY KEY,
+    title TEXT NOT NULL,
+    description TEXT NOT NULL,
+    host_uid TEXT NOT NULL,
+    lat DOUBLE PRECISION NOT NULL,
+    lng DOUBLE PRECISION NOT NULL,
+    created TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX ON listings (host_uid);
