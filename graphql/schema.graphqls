@@ -6,12 +6,18 @@ type User {
 }
 
 type Listing {
-  id: ID!
+  id: Int!
   title: String!
+  location: String!
   description: String!
   host: User!
+  picture_url: String!
+  distance_km: Float!
+  rating: Float!
+  price_per_night: Int!
 }
 
 type Query {
   listings: [Listing!]!
+  getListing(id: Int!): Listing
 }

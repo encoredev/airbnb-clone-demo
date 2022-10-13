@@ -38,8 +38,8 @@ type CreateCheckoutSessionResponse struct {
 func CreateCheckoutSession(ctx context.Context, p *CreateCheckoutSessionParams) (*CreateCheckoutSessionResponse, error) {
 	params := &stripe.CheckoutSessionParams{
 		Mode:         stripe.String(string(stripe.CheckoutSessionModePayment)),
-		SuccessURL:   stripe.String(cfg.Checkout.SuccessURL),
-		CancelURL:    stripe.String(cfg.Checkout.CancelURL),
+		SuccessURL:   stripe.String("http://localhost:3000/success"),
+		CancelURL:    stripe.String("http://localhost:3000/cancel"),
 		AutomaticTax: &stripe.CheckoutSessionAutomaticTaxParams{Enabled: stripe.Bool(true)},
 	}
 

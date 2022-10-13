@@ -47,14 +47,20 @@ type DirectiveRoot struct {
 
 type ComplexityRoot struct {
 	Listing struct {
-		Description func(childComplexity int) int
-		Host        func(childComplexity int) int
-		ID          func(childComplexity int) int
-		Title       func(childComplexity int) int
+		Description   func(childComplexity int) int
+		DistanceKm    func(childComplexity int) int
+		Host          func(childComplexity int) int
+		ID            func(childComplexity int) int
+		Location      func(childComplexity int) int
+		PictureURL    func(childComplexity int) int
+		PricePerNight func(childComplexity int) int
+		Rating        func(childComplexity int) int
+		Title         func(childComplexity int) int
 	}
 
 	Query struct {
-		Listings func(childComplexity int) int
+		GetListing func(childComplexity int, id int) int
+		Listings   func(childComplexity int) int
 	}
 
 	User struct {
@@ -70,6 +76,7 @@ type ListingResolver interface {
 }
 type QueryResolver interface {
 	Listings(ctx context.Context) ([]*listing.Listing, error)
+	GetListing(ctx context.Context, id int) (*listing.Listing, error)
 }
 
 type executableSchema struct {
@@ -94,6 +101,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Listing.Description(childComplexity), true
 
+	case "Listing.distance_km":
+		if e.complexity.Listing.DistanceKm == nil {
+			break
+		}
+
+		return e.complexity.Listing.DistanceKm(childComplexity), true
+
 	case "Listing.host":
 		if e.complexity.Listing.Host == nil {
 			break
@@ -108,12 +122,52 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Listing.ID(childComplexity), true
 
+	case "Listing.location":
+		if e.complexity.Listing.Location == nil {
+			break
+		}
+
+		return e.complexity.Listing.Location(childComplexity), true
+
+	case "Listing.picture_url":
+		if e.complexity.Listing.PictureURL == nil {
+			break
+		}
+
+		return e.complexity.Listing.PictureURL(childComplexity), true
+
+	case "Listing.price_per_night":
+		if e.complexity.Listing.PricePerNight == nil {
+			break
+		}
+
+		return e.complexity.Listing.PricePerNight(childComplexity), true
+
+	case "Listing.rating":
+		if e.complexity.Listing.Rating == nil {
+			break
+		}
+
+		return e.complexity.Listing.Rating(childComplexity), true
+
 	case "Listing.title":
 		if e.complexity.Listing.Title == nil {
 			break
 		}
 
 		return e.complexity.Listing.Title(childComplexity), true
+
+	case "Query.getListing":
+		if e.complexity.Query.GetListing == nil {
+			break
+		}
+
+		args, err := ec.field_Query_getListing_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.GetListing(childComplexity, args["id"].(int)), true
 
 	case "Query.listings":
 		if e.complexity.Query.Listings == nil {
@@ -210,14 +264,20 @@ var sources = []*ast.Source{
 }
 
 type Listing {
-  id: ID!
+  id: Int!
   title: String!
+  location: String!
   description: String!
   host: User!
+  picture_url: String!
+  distance_km: Float!
+  rating: Float!
+  price_per_night: Int!
 }
 
 type Query {
   listings: [Listing!]!
+  getListing(id: Int!): Listing
 }`, BuiltIn: false},
 }
 var parsedSchema = gqlparser.MustLoadSchema(sources...)
@@ -238,6 +298,21 @@ func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs
 		}
 	}
 	args["name"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_getListing_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 int
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg0, err = ec.unmarshalNInt2int(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
 	return args, nil
 }
 
@@ -305,9 +380,9 @@ func (ec *executionContext) _Listing_id(ctx context.Context, field graphql.Colle
 		}
 		return graphql.Null
 	}
-	res := resTmp.(int64)
+	res := resTmp.(int)
 	fc.Result = res
-	return ec.marshalNID2int64(ctx, field.Selections, res)
+	return ec.marshalNInt2int(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Listing_id(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -317,7 +392,7 @@ func (ec *executionContext) fieldContext_Listing_id(ctx context.Context, field g
 		IsMethod:   false,
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type ID does not have child fields")
+			return nil, errors.New("field of type Int does not have child fields")
 		},
 	}
 	return fc, nil
@@ -355,6 +430,50 @@ func (ec *executionContext) _Listing_title(ctx context.Context, field graphql.Co
 }
 
 func (ec *executionContext) fieldContext_Listing_title(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Listing",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Listing_location(ctx context.Context, field graphql.CollectedField, obj *listing.Listing) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Listing_location(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Location, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Listing_location(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Listing",
 		Field:      field,
@@ -465,6 +584,182 @@ func (ec *executionContext) fieldContext_Listing_host(ctx context.Context, field
 	return fc, nil
 }
 
+func (ec *executionContext) _Listing_picture_url(ctx context.Context, field graphql.CollectedField, obj *listing.Listing) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Listing_picture_url(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.PictureURL, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Listing_picture_url(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Listing",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Listing_distance_km(ctx context.Context, field graphql.CollectedField, obj *listing.Listing) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Listing_distance_km(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.DistanceKm(ctx), nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(float64)
+	fc.Result = res
+	return ec.marshalNFloat2float64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Listing_distance_km(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Listing",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Float does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Listing_rating(ctx context.Context, field graphql.CollectedField, obj *listing.Listing) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Listing_rating(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Rating, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(float64)
+	fc.Result = res
+	return ec.marshalNFloat2float64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Listing_rating(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Listing",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Float does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Listing_price_per_night(ctx context.Context, field graphql.CollectedField, obj *listing.Listing) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Listing_price_per_night(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.PricePerNight, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Listing_price_per_night(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Listing",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Query_listings(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Query_listings(ctx, field)
 	if err != nil {
@@ -508,13 +803,95 @@ func (ec *executionContext) fieldContext_Query_listings(ctx context.Context, fie
 				return ec.fieldContext_Listing_id(ctx, field)
 			case "title":
 				return ec.fieldContext_Listing_title(ctx, field)
+			case "location":
+				return ec.fieldContext_Listing_location(ctx, field)
 			case "description":
 				return ec.fieldContext_Listing_description(ctx, field)
 			case "host":
 				return ec.fieldContext_Listing_host(ctx, field)
+			case "picture_url":
+				return ec.fieldContext_Listing_picture_url(ctx, field)
+			case "distance_km":
+				return ec.fieldContext_Listing_distance_km(ctx, field)
+			case "rating":
+				return ec.fieldContext_Listing_rating(ctx, field)
+			case "price_per_night":
+				return ec.fieldContext_Listing_price_per_night(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Listing", field.Name)
 		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_getListing(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_getListing(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().GetListing(rctx, fc.Args["id"].(int))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*listing.Listing)
+	fc.Result = res
+	return ec.marshalOListing2ᚖencoreᚗappᚋlistingᚐListing(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_getListing(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Listing_id(ctx, field)
+			case "title":
+				return ec.fieldContext_Listing_title(ctx, field)
+			case "location":
+				return ec.fieldContext_Listing_location(ctx, field)
+			case "description":
+				return ec.fieldContext_Listing_description(ctx, field)
+			case "host":
+				return ec.fieldContext_Listing_host(ctx, field)
+			case "picture_url":
+				return ec.fieldContext_Listing_picture_url(ctx, field)
+			case "distance_km":
+				return ec.fieldContext_Listing_distance_km(ctx, field)
+			case "rating":
+				return ec.fieldContext_Listing_rating(ctx, field)
+			case "price_per_night":
+				return ec.fieldContext_Listing_price_per_night(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Listing", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_getListing_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
 	}
 	return fc, nil
 }
@@ -2620,6 +2997,13 @@ func (ec *executionContext) _Listing(ctx context.Context, sel ast.SelectionSet, 
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
+		case "location":
+
+			out.Values[i] = ec._Listing_location(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
 		case "description":
 
 			out.Values[i] = ec._Listing_description(ctx, field, obj)
@@ -2647,6 +3031,47 @@ func (ec *executionContext) _Listing(ctx context.Context, sel ast.SelectionSet, 
 				return innerFunc(ctx)
 
 			})
+		case "picture_url":
+
+			out.Values[i] = ec._Listing_picture_url(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "distance_km":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Listing_distance_km(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
+			})
+		case "rating":
+
+			out.Values[i] = ec._Listing_rating(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "price_per_night":
+
+			out.Values[i] = ec._Listing_price_per_night(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -2690,6 +3115,26 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				if res == graphql.Null {
 					atomic.AddUint32(&invalids, 1)
 				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
+			})
+		case "getListing":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_getListing(ctx, field)
 				return res
 			}
 
@@ -3096,6 +3541,21 @@ func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.Se
 	return res
 }
 
+func (ec *executionContext) unmarshalNFloat2float64(ctx context.Context, v interface{}) (float64, error) {
+	res, err := graphql.UnmarshalFloatContext(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNFloat2float64(ctx context.Context, sel ast.SelectionSet, v float64) graphql.Marshaler {
+	res := graphql.MarshalFloatContext(v)
+	if res == graphql.Null {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+	}
+	return graphql.WrapContextMarshaler(ctx, res)
+}
+
 func (ec *executionContext) unmarshalNID2encoreᚗdevᚋbetaᚋauthᚐUID(ctx context.Context, v interface{}) (auth.UID, error) {
 	tmp, err := graphql.UnmarshalString(v)
 	res := auth.UID(tmp)
@@ -3112,13 +3572,13 @@ func (ec *executionContext) marshalNID2encoreᚗdevᚋbetaᚋauthᚐUID(ctx cont
 	return res
 }
 
-func (ec *executionContext) unmarshalNID2int64(ctx context.Context, v interface{}) (int64, error) {
-	res, err := graphql.UnmarshalInt64(v)
+func (ec *executionContext) unmarshalNInt2int(ctx context.Context, v interface{}) (int, error) {
+	res, err := graphql.UnmarshalInt(v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNID2int64(ctx context.Context, sel ast.SelectionSet, v int64) graphql.Marshaler {
-	res := graphql.MarshalInt64(v)
+func (ec *executionContext) marshalNInt2int(ctx context.Context, sel ast.SelectionSet, v int) graphql.Marshaler {
+	res := graphql.MarshalInt(v)
 	if res == graphql.Null {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -3487,6 +3947,13 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 	}
 	res := graphql.MarshalBoolean(*v)
 	return res
+}
+
+func (ec *executionContext) marshalOListing2ᚖencoreᚗappᚋlistingᚐListing(ctx context.Context, sel ast.SelectionSet, v *listing.Listing) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._Listing(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalOString2ᚖstring(ctx context.Context, v interface{}) (*string, error) {

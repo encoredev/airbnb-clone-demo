@@ -19,7 +19,7 @@ const (
 // Loaders wrap your data loaders to inject via middleware
 type Loaders struct {
 	users    *dataloader.Loader[auth.UID, user.User]
-	listings *dataloader.Loader[int64, listing.Listing]
+	listings *dataloader.Loader[int, listing.Listing]
 }
 
 // NewLoaders instantiates data loaders for the middleware
@@ -28,7 +28,7 @@ func NewLoaders() *Loaders {
 		users: batchedLoader(func(ctx context.Context, ids *batching.GetParams[auth.UID]) (*batching.Response[auth.UID, user.User], error) {
 			return user.MultiGet(ctx, ids)
 		}),
-		listings: batchedLoader(func(ctx context.Context, ids *batching.GetParams[int64]) (*batching.Response[int64, listing.Listing], error) {
+		listings: batchedLoader(func(ctx context.Context, ids *batching.GetParams[int]) (*batching.Response[int, listing.Listing], error) {
 			return listing.MultiGet(ctx, ids)
 		}),
 	}

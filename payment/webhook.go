@@ -4,7 +4,6 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"encore.dev"
 	"encore.dev/rlog"
 	"github.com/stripe/stripe-go/v73"
 	"github.com/stripe/stripe-go/v73/webhook"
@@ -40,12 +39,5 @@ func handleCheckoutSessionCompleted(w http.ResponseWriter, event stripe.Event) {
 
 // webhookSecret returns the webhook signing secret to use.
 func webhookSecret() string {
-	if encore.Meta().Environment.Cloud == encore.CloudLocal {
-		if s := cfg.LocalWebhookSecret; s != "" {
-			rlog.Info("using local override for Stripe webhook secret")
-			return s
-		}
-	}
-
 	return secrets.StripeWebhookSigningSecret
 }
