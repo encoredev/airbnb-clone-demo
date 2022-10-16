@@ -1,0 +1,27 @@
+query IndexView {
+    listings {
+        id
+        title
+        location
+        description
+        pictures
+        distanceKm
+        rating
+        pricePerNight
+    }
+}
+
+query DetailView($id: Int!) {
+    getListing(id: $id) {
+        id
+        title
+        location
+        description
+        pictures
+        distanceKm
+        rating
+        pricePerNight
+        numBeds
+        numBaths
+    }
+}
