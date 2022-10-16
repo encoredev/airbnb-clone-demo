@@ -8,6 +8,8 @@ require (
 	github.com/99designs/gqlgen v0.17.20
 	github.com/google/go-cmp v0.5.8
 	github.com/graph-gophers/dataloader/v7 v7.0.0
+	github.com/lib/pq v1.10.2
+	github.com/stripe/stripe-go/v73 v73.12.0
 	github.com/vektah/gqlparser/v2 v2.5.1
 	go4.org v0.0.0-20201209231011-d4a079459e60
 	google.golang.org/api v0.96.0
@@ -42,7 +44,6 @@ require (
 	github.com/jinzhu/now v1.1.4 // indirect
 	github.com/mitchellh/mapstructure v1.3.1 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
-	github.com/stripe/stripe-go/v73 v73.12.0 // indirect
 	github.com/urfave/cli/v2 v2.8.1 // indirect
 	github.com/xrash/smetrics v0.0.0-20201216005158-039620a65673 // indirect
 	go.opencensus.io v0.23.0 // indirect

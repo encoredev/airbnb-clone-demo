@@ -2,49 +2,27 @@ package listing
 
 import (
 	"context"
+	"math"
 	"time"
 
 	"encore.app/pkg/batching"
 	"encore.dev/beta/auth"
 )
 
-// Listing represents a home listing.
-type Listing struct {
-	ID          int64  `json:"id"`
-	Title       string `json:"title"`
-	Description string
-	// Lat, Lng are the latitude and longitude of the home.
-	Lat     float64   `json:"lat"`
-	Lng     float64   `json:"lng"`
-	HostUID auth.UID  `json:"host_uid"`
-	Created time.Time `json:"created"`
-}
-
-// CreateParams are the parameters for creating a new listing.
-type CreateParams struct {
-	Title       string  `json:"title"`
-	Description string  `json:"description"`
-	Lat         float64 `json:"lat"`
-	Lng         float64 `json:"lng"`
-}
-
 // Create creates a new listing.
 //
-//encore:api auth method=POST path=/listing
-func (s *Service) Create(ctx context.Context, p *CreateParams) (*Listing, error) {
-	host, _ := auth.UserID()
-	l := &Listing{
-		Title:       p.Title,
-		Description: p.Description,
-		HostUID:     host,
-		Lat:         p.Lat,
-		Lng:         p.Lng,
-		Created:     time.Now(),
-	}
-	if err := s.db.Create(l).Error; err != nil {
+//encore:api public method=POST path=/listing
+func (s *Service) Create(ctx context.Context, p *Listing) (*Listing, error) {
+	// Set fields the user should not control.
+	p.ID = 0
+	p.Created = time.Now()
+	p.HostUID, _ = auth.UserID()
+	p.Rating = math.Round(p.Rating*100) / 100
+	if err := s.db.Table("listings").Create(p).Error; err != nil {
 		return nil, err
 	}
-	return l, nil
+
+	return p, nil
 }
 
 type ListResponse struct {
@@ -62,17 +40,28 @@ func (s *Service) List(ctx context.Context) (*ListResponse, error) {
 	return &ListResponse{Listings: listings}, nil
 }
 
-// MultiGet returns a list of users.
+// MultiGet returns a list of listings.
 //
 //encore:api private method=GET path=/listing/multi
-func (s *Service) MultiGet(ctx context.Context, p *batching.GetParams[int64]) (*batching.Response[int64, Listing], error) {
+func (s *Service) MultiGet(ctx context.Context, p *batching.GetParams[int]) (*batching.Response[int, Listing], error) {
 	var listings []Listing
 	if err := s.db.Find(&listings, p.IDs).Error; err != nil {
 		return nil, err
 	}
-	resp := batching.NewResponse[int64, Listing]()
+	resp := batching.NewResponse[int, Listing]()
 	for _, l := range listings {
 		resp.Records[l.ID] = l
 	}
 	return resp, nil
+}
+
+// Get returns a listing by id.
+//
+//encore:api private method=GET path=/listing/single/:id
+func (s *Service) Get(ctx context.Context, id int) (*Listing, error) {
+	var l Listing
+	if err := s.db.Find(&l, id).Error; err != nil {
+		return nil, err
+	}
+	return &l, nil
 }

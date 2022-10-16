@@ -11,7 +11,7 @@ import (
 
 func TestCreate(t *testing.T) {
 	ctx, usr := usertest.CreateUser(t)
-	listing, err := Create(ctx, &CreateParams{
+	listing, err := Create(ctx, &Listing{
 		Title:       "title",
 		Description: "description",
 		Lat:         1, Lng: 2,
@@ -27,12 +27,12 @@ func TestCreate(t *testing.T) {
 
 func TestList(t *testing.T) {
 	ctx, _ := usertest.CreateUser(t)
-	a := must(Create(ctx, &CreateParams{
+	a := must(Create(ctx, &Listing{
 		Title:       "one",
 		Description: "foo",
 		Lat:         1, Lng: 2,
 	}))
-	b := must(Create(ctx, &CreateParams{
+	b := must(Create(ctx, &Listing{
 		Title:       "two",
 		Description: "bar",
 		Lat:         3, Lng: 4,
