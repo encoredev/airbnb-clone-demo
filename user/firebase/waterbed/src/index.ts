@@ -18,6 +18,7 @@ export const notifyBackend = functions
 
     const url = baseURL + "/user.BeforeCreateWebhook";
     await rp(url, {
+      method: "POST",
       headers: {
         "X-Shared-Secret": process.env.ENCORE_WEBHOOK_SHARED_SECRET!,
         "Content-Type": "application/json",
