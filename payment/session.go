@@ -7,24 +7,6 @@ import (
 	"github.com/stripe/stripe-go/v73/checkout/session"
 )
 
-// ProductDesc describes a product being sold.
-type ProductDesc struct {
-	DisplayName       string
-	Description       string
-	ImageURLs         []string
-	StripeTaxCategory string
-
-	Metadata map[string]string
-}
-
-type LineItem struct {
-	Product      ProductDesc
-	Currency     string
-	UnitAmount   int64 // in cents (or local equivalent) of Currency
-	Quantity     int64
-	TaxExclusive bool // if true, price is exclusive of tax
-}
-
 type CreateCheckoutSessionParams struct {
 	Items []LineItem
 }
@@ -38,8 +20,8 @@ type CreateCheckoutSessionResponse struct {
 func CreateCheckoutSession(ctx context.Context, p *CreateCheckoutSessionParams) (*CreateCheckoutSessionResponse, error) {
 	params := &stripe.CheckoutSessionParams{
 		Mode:         stripe.String(string(stripe.CheckoutSessionModePayment)),
-		SuccessURL:   stripe.String(cfg.Checkout.SuccessURL),
-		CancelURL:    stripe.String(cfg.Checkout.CancelURL),
+		SuccessURL:   stripe.String("http://localhost:3000/success"),
+		CancelURL:    stripe.String("http://localhost:3000/cancel"),
 		AutomaticTax: &stripe.CheckoutSessionAutomaticTaxParams{Enabled: stripe.Bool(true)},
 	}
 
@@ -52,7 +34,7 @@ func CreateCheckoutSession(ctx context.Context, p *CreateCheckoutSessionParams) 
 		product := &stripe.CheckoutSessionLineItemPriceDataProductDataParams{
 			Name:        stripe.String(it.Product.DisplayName),
 			Description: stripe.String(it.Product.Description),
-			TaxCode:     stripe.String(it.Product.StripeTaxCategory),
+			TaxCode:     stripe.String(string(it.Product.TaxCategory)),
 			Metadata:    it.Product.Metadata,
 		}
 		for _, img := range it.Product.ImageURLs {
