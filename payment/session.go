@@ -8,7 +8,8 @@ import (
 )
 
 type CreateCheckoutSessionParams struct {
-	Items []LineItem
+	CustomerEmail *string
+	Items         []LineItem
 }
 
 type CreateCheckoutSessionResponse struct {
@@ -19,10 +20,11 @@ type CreateCheckoutSessionResponse struct {
 //encore:api private
 func CreateCheckoutSession(ctx context.Context, p *CreateCheckoutSessionParams) (*CreateCheckoutSessionResponse, error) {
 	params := &stripe.CheckoutSessionParams{
-		Mode:         stripe.String(string(stripe.CheckoutSessionModePayment)),
-		SuccessURL:   stripe.String("http://localhost:3000/success"),
-		CancelURL:    stripe.String("http://localhost:3000/cancel"),
-		AutomaticTax: &stripe.CheckoutSessionAutomaticTaxParams{Enabled: stripe.Bool(true)},
+		Mode:          stripe.String(string(stripe.CheckoutSessionModePayment)),
+		SuccessURL:    stripe.String("http://localhost:3000/success"),
+		CancelURL:     stripe.String("http://localhost:3000/cancel"),
+		AutomaticTax:  &stripe.CheckoutSessionAutomaticTaxParams{Enabled: stripe.Bool(true)},
+		CustomerEmail: p.CustomerEmail,
 	}
 
 	for _, it := range p.Items {

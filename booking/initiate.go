@@ -9,6 +9,7 @@ import (
 
 	"encore.app/listing"
 	"encore.app/payment"
+	"encore.app/user"
 	"encore.dev/beta/auth"
 	"encore.dev/rlog"
 )
@@ -17,6 +18,7 @@ type InitiateParams struct {
 	ListingID int    `json:"listingID"`
 	Checkin   string `json:"checkin"`
 	Checkout  string `json:"checkout"`
+	Guests    int    `json:"guests"`
 }
 
 type InitiateResponse struct {
@@ -31,6 +33,7 @@ func Initiate(ctx context.Context, p *InitiateParams) (*InitiateResponse, error)
 	}
 
 	guestUID, _ := auth.UserID()
+	guest, _ := auth.Data().(*user.User)
 
 	numDays, err := daysBetweenDates(p.Checkin, p.Checkout)
 	if err != nil {
@@ -52,6 +55,7 @@ func Initiate(ctx context.Context, p *InitiateParams) (*InitiateResponse, error)
 	}
 
 	sess, err := payment.CreateCheckoutSession(ctx, &payment.CreateCheckoutSessionParams{
+		CustomerEmail: guest.Email,
 		Items: []payment.LineItem{
 			{
 				Currency:     "sek",
@@ -68,6 +72,7 @@ func Initiate(ctx context.Context, p *InitiateParams) (*InitiateResponse, error)
 						"checkin":    p.Checkin,
 						"checkout":   p.Checkout,
 						"guest_uid":  string(guestUID),
+						"guests":     strconv.Itoa(p.Guests),
 					},
 				},
 			},
