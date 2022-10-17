@@ -51,6 +51,7 @@ const Detail: FC<Props> = ({ id }) => {
           <div className="relative grid grid-cols-2 gap-2 h-96 w-1/2 min-w-0">
             {listing.pictures.slice(1, 5).map((img, i) => (
               <img
+                key={img}
                 src={img}
                 alt={listing.title}
                 className={`h-full w-full object-cover min-h-0 ${
