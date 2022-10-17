@@ -3,6 +3,7 @@ package payment
 import (
 	"context"
 
+	"encore.dev"
 	"github.com/stripe/stripe-go/v73"
 	"github.com/stripe/stripe-go/v73/checkout/session"
 )
@@ -19,10 +20,11 @@ type CreateCheckoutSessionResponse struct {
 
 //encore:api private
 func CreateCheckoutSession(ctx context.Context, p *CreateCheckoutSessionParams) (*CreateCheckoutSessionResponse, error) {
+	baseURL := frontendBaseURL()
 	params := &stripe.CheckoutSessionParams{
 		Mode:          stripe.String(string(stripe.CheckoutSessionModePayment)),
-		SuccessURL:    stripe.String("http://localhost:3000/success"),
-		CancelURL:     stripe.String("http://localhost:3000/cancel"),
+		SuccessURL:    stripe.String(baseURL + "/success"),
+		CancelURL:     stripe.String(baseURL + "/cancel"),
 		AutomaticTax:  &stripe.CheckoutSessionAutomaticTaxParams{Enabled: stripe.Bool(true)},
 		CustomerEmail: p.CustomerEmail,
 	}
@@ -62,6 +64,15 @@ func CreateCheckoutSession(ctx context.Context, p *CreateCheckoutSessionParams) 
 	return &CreateCheckoutSessionResponse{
 		TargetURL: s.URL,
 	}, nil
+}
+
+func frontendBaseURL() string {
+	switch encore.Meta().Environment.Cloud {
+	case encore.CloudLocal:
+		return "http://localhost:3000"
+	default:
+		return "https://water-mattress-5se2.vercel.app"
+	}
 }
 
 var secrets struct {
