@@ -15,8 +15,8 @@ const fbApp = initializeApp(firebaseConfig);
 const auth = getAuth();
 
 // Connect to the Firebase emulator in development.
-if (process.env.NODE_ENV === "development") {
-  connectAuthEmulator(auth, "http://localhost:9099");
-}
+// if (process.env.NODE_ENV === "development") {
+//   connectAuthEmulator(auth, "http://localhost:9099");
+// }
 
 export { fbApp, auth };

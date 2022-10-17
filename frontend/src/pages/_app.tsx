@@ -6,7 +6,7 @@ import "../styles/globals.css";
 import { createClient, Provider } from "urql";
 
 const client = createClient({
-  url: "http://localhost:4000/graphql",
+  url: "https://staging-airbnb-mkg2.encr.app/graphql",
 });
 
 function MyApp({ Component, pageProps }: AppProps) {

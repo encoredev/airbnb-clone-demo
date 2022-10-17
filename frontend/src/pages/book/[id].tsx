@@ -5,7 +5,7 @@ import { FC, useState } from "react";
 import FirebaseAuthPage from "../../components/FirebaseAuthPage";
 import useFirebaseAuth from "../../components/FirebaseProvider";
 import { useDetailViewQuery } from "../../graphql";
-import Client, { Local } from "../../lib/client";
+import Client, { Environment, Local } from "../../lib/client";
 import { auth } from "../../lib/fb";
 
 interface Props {
@@ -36,19 +36,15 @@ const Book: FC<Props> = ({ listingID, checkin, checkout, guests }) => {
 
   const doBook = async () => {
     setLoading(true);
-    console.log("getting token");
     try {
       const token = await authUser.user!.getIdToken(true);
-      console.log("got token", token);
-      const client = new Client(Local, { auth: token });
-      console.log("calling initiate");
+      const client = new Client(Environment("staging"), { auth: token });
       const resp = await client.booking.Initiate({
         listingID,
         checkin,
         checkout,
         guests,
       });
-      console.log("got resp", resp);
       window.location.assign(resp.RedirectURL);
     } catch (err) {
       setLoading(false);
