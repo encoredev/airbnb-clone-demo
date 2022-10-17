@@ -1,60 +1,55 @@
-import firebase from "firebase/compat/app";
-import { connectAuthEmulator, getAuth } from "firebase/auth";
+import { User } from "firebase/auth";
 import {
-  useState,
-  useEffect,
-  PropsWithChildren,
-  FC,
   createContext,
+  FC,
+  PropsWithChildren,
   useContext,
+  useEffect,
+  useState,
 } from "react";
-
-interface AuthUser {
-  uid: string;
-  email: string;
-}
-
-const formatAuthUser = (user: any) => ({
-  uid: user.uid,
-  email: user.email,
-});
+import { auth } from "../lib/fb";
 
 export default function useFirebaseAuth() {
-  const [authUser, setAuthUser] = useState<any>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const authStateChanged = async (authState: any) => {
-    if (!authState) {
-      setAuthUser(null);
+  const authStateChanged = async (u: User | null) => {
+    if (!u) {
+      setUser(null);
       setLoading(false);
       return;
     }
 
     setLoading(true);
-    var formattedUser = formatAuthUser(authState);
-    setAuthUser(formattedUser);
+    setUser(u);
     setLoading(false);
   };
 
   // listen for Firebase state change
   useEffect(() => {
-    const unsubscribe = firebase.auth().onAuthStateChanged(authStateChanged);
-    return () => unsubscribe();
+    const prom = (async () => {
+      const unsubscribe = auth.onAuthStateChanged(authStateChanged);
+      return () => unsubscribe();
+    })();
+
+    return () => {
+      prom.then((unsub) => unsub());
+    };
   }, []);
 
   return {
-    authUser,
+    user,
     loading,
   };
 }
 
 interface AuthUserData {
-  authUser: null | AuthUser;
+  user: User | null;
   loading: boolean;
 }
 
 const AuthContext = createContext<AuthUserData>({
-  authUser: null,
+  user: null,
   loading: true,
 });
 

@@ -29,43 +29,43 @@ const Detail: FC<Props> = ({ id }) => {
           {listing.title}
         </h2>
         <p className="text-sm text-gray-700 flex items-center gap-1">
-          <span>
+          <div className="flex items-center">
             <StarIcon className="h-4 w-4" />
             {Math.round(listing.rating * 100) / 100}
-          </span>
+          </div>
           <span>·</span>
           27 reviews
           <span>·</span>
           {listing.location}
         </p>
 
-        <div className="mt-6 grid grid-cols-1 gap-y-10 gap-x-6 sm:grid-cols-2 lg:grid-cols-2 xl:gap-x-8">
-          <div className="group relative">
-            <div className="min-h-96 aspect-w-1 aspect-h-1 w-full overflow-hidden rounded-md bg-gray-200 group-hover:opacity-75 lg:aspect-none lg:h-96">
-              <img
-                src={listing.pictures[0]}
-                alt={listing.title}
-                className="h-full w-full object-cover object-center lg:h-full lg:w-full"
-              />
-            </div>
+        <div className="mt-6 flex items-stretch gap-2">
+          <div className="group relative min-w-0 w-1/2 h-96">
+            <img
+              src={listing.pictures[0]}
+              alt={listing.title}
+              className="h-full w-full object-cover min-h-0 rounded-l-md"
+            />
           </div>
 
-          <div className="relative grid grid-cols-2 gap-4">
-            {listing.pictures.slice(1, 5).map((img) => (
-              <div className="aspect-w-1 aspect-h-1 w-full overflow-hidden rounded-md bg-gray-200 group-hover:opacity-75 lg:aspect-none">
-                <img
-                  src={img}
-                  alt={listing.title}
-                  className="h-full w-full object-cover object-center lg:h-full lg:w-full"
-                />
-              </div>
+          <div className="relative grid grid-cols-2 gap-2 h-96 w-1/2 min-w-0">
+            {listing.pictures.slice(1, 5).map((img, i) => (
+              <img
+                src={img}
+                alt={listing.title}
+                className={`h-full w-full object-cover min-h-0 ${
+                  i === 1 ? "rounded-tr-md" : i === 3 ? "rounded-br-md" : ""
+                }`}
+              />
             ))}
           </div>
         </div>
 
         <div className="mt-8 flex justify-between items-start">
           <div className="min-w-0 flex-1">
-            <h2 className="text-xl">Entire cabin hosted by Stig</h2>
+            <h2 className="text-xl">
+              {listing.description || "Entire home hosted by Stig"}
+            </h2>
             <div className="flex items-center gap-1 font-light">
               <span>{Math.ceil(listing.numBeds * 1.5)} guests</span>
               <span>·</span>

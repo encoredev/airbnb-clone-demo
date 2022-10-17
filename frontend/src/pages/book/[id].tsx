@@ -1,8 +1,12 @@
 import { StarIcon } from "@heroicons/react/24/solid";
-import { GetServerSideProps } from "next";
-import { FC } from "react";
-import { useDetailViewQuery } from "../../graphql";
 import { format, parse } from "date-fns";
+import { GetServerSideProps } from "next";
+import { FC, useState } from "react";
+import FirebaseAuthPage from "../../components/FirebaseAuthPage";
+import useFirebaseAuth from "../../components/FirebaseProvider";
+import { useDetailViewQuery } from "../../graphql";
+import Client, { Local } from "../../lib/client";
+import { auth } from "../../lib/fb";
 
 interface Props {
   listingID: number;
@@ -12,6 +16,8 @@ interface Props {
 }
 
 const Book: FC<Props> = ({ listingID, checkin, checkout, guests }) => {
+  const [loading, setLoading] = useState(false);
+  const authUser = useFirebaseAuth();
   const [result] = useDetailViewQuery({
     variables: { id: listingID },
   });
@@ -27,6 +33,27 @@ const Book: FC<Props> = ({ listingID, checkin, checkout, guests }) => {
 
   const checkinDate = parse(checkin, "y-M-d", new Date());
   const checkoutDate = parse(checkout, "y-M-d", new Date());
+
+  const doBook = async () => {
+    setLoading(true);
+    console.log("getting token");
+    try {
+      const token = await authUser.user!.getIdToken(true);
+      console.log("got token", token);
+      const client = new Client(Local, { auth: token });
+      console.log("calling initiate");
+      const resp = await client.booking.Initiate({
+        listingID,
+        checkin,
+        checkout,
+        guests,
+      });
+      console.log("got resp", resp);
+      window.location.assign(resp.RedirectURL);
+    } catch (err) {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="bg-white">
@@ -52,6 +79,31 @@ const Book: FC<Props> = ({ listingID, checkin, checkout, guests }) => {
             </h3>
             <div className="mt-1">
               {guests} guest{guests !== 1 ? "s" : ""}
+            </div>
+
+            <div className="mt-8">
+              {authUser.loading ? (
+                <div>Loading auth information...</div>
+              ) : !authUser.user ? (
+                <FirebaseAuthPage />
+              ) : (
+                <div>
+                  <button
+                    type="button"
+                    disabled={loading}
+                    className="inline-flex justify-center items-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                    onClick={() => doBook()}
+                  >
+                    {loading ? (
+                      <>
+                        <LoadingIcon className="h-4 w-4 mr-1" /> Loading
+                      </>
+                    ) : (
+                      <>Book now</>
+                    )}
+                  </button>
+                </div>
+              )}
             </div>
           </div>
 
@@ -113,3 +165,74 @@ export const getServerSideProps: GetServerSideProps<Props> = async (
     },
   };
 };
+
+const LoadingIcon: FC<{ className?: string }> = ({ className }) => (
+  <svg className={className} viewBox="0 0 120 30" fill="currentColor">
+    <circle cx="15" cy="15" r="15">
+      <animate
+        attributeName="r"
+        from="15"
+        to="15"
+        begin="0s"
+        dur="0.8s"
+        values="15;9;15"
+        calcMode="linear"
+        repeatCount="indefinite"
+      />
+      <animate
+        attributeName="fill-opacity"
+        from="1"
+        to="1"
+        begin="0s"
+        dur="0.8s"
+        values="1;.5;1"
+        calcMode="linear"
+        repeatCount="indefinite"
+      />
+    </circle>
+    <circle cx="60" cy="15" r="9" fillOpacity="0.3">
+      <animate
+        attributeName="r"
+        from="9"
+        to="9"
+        begin="0s"
+        dur="0.8s"
+        values="9;15;9"
+        calcMode="linear"
+        repeatCount="indefinite"
+      />
+      <animate
+        attributeName="fill-opacity"
+        from="0.5"
+        to="0.5"
+        begin="0s"
+        dur="0.8s"
+        values=".5;1;.5"
+        calcMode="linear"
+        repeatCount="indefinite"
+      />
+    </circle>
+    <circle cx="105" cy="15" r="15">
+      <animate
+        attributeName="r"
+        from="15"
+        to="15"
+        begin="0s"
+        dur="0.8s"
+        values="15;9;15"
+        calcMode="linear"
+        repeatCount="indefinite"
+      />
+      <animate
+        attributeName="fill-opacity"
+        from="1"
+        to="1"
+        begin="0s"
+        dur="0.8s"
+        values="1;.5;1"
+        calcMode="linear"
+        repeatCount="indefinite"
+      />
+    </circle>
+  </svg>
+);
