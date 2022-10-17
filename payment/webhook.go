@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"net/http"
 
+	"encore.dev"
 	"encore.dev/pubsub"
 	"encore.dev/rlog"
 	"github.com/stripe/stripe-go/v73"
@@ -78,7 +79,7 @@ func handleCheckoutSessionCompleted(ctx context.Context, w http.ResponseWriter, 
 
 // webhookSecret returns the webhook signing secret to use.
 func webhookSecret() string {
-	if true {
+	if encore.Meta().Environment.Cloud == encore.CloudLocal {
 		return "whsec_159bd115f55f97603121fa8bde7d72537903f377cae03e52a36ea10d7fbd85cb"
 	}
 	return secrets.StripeWebhookSigningSecret
