@@ -15,6 +15,8 @@ func TestCreate(t *testing.T) {
 		Title:       "title",
 		Description: "description",
 		Lat:         1, Lng: 2,
+		Tags:     []string{"farm"},
+		Pictures: Pictures{},
 	})
 	if err != nil {
 		t.Fatal(err)
@@ -31,11 +33,15 @@ func TestList(t *testing.T) {
 		Title:       "one",
 		Description: "foo",
 		Lat:         1, Lng: 2,
+		Tags:     []string{"farm"},
+		Pictures: Pictures{},
 	}))
 	b := must(Create(ctx, &Listing{
 		Title:       "two",
 		Description: "bar",
 		Lat:         3, Lng: 4,
+		Tags:     []string{"farm"},
+		Pictures: Pictures{},
 	}))
 
 	resp, err := List(ctx)
