@@ -3,22 +3,21 @@ import Head from "next/head";
 import Layout from "../components/Layout";
 import "../styles/globals.css";
 
-import { createClient, Provider } from "urql";
-
-const client = createClient({
-  url: "https://staging-airbnb-mkg2.encr.app/graphql",
-});
+import { createClient } from "urql";
+import { EnvProvider, GraphQLProvider } from "../lib/env";
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (
-    <Provider value={client}>
-      <Layout>
-        <Head>
-          <link rel="stylesheet" href="https://rsms.me/inter/inter.css" />
-        </Head>
-        <Component {...pageProps} />
-      </Layout>
-    </Provider>
+    <EnvProvider>
+      <GraphQLProvider>
+        <Layout>
+          <Head>
+            <link rel="stylesheet" href="https://rsms.me/inter/inter.css" />
+          </Head>
+          <Component {...pageProps} />
+        </Layout>
+      </GraphQLProvider>
+    </EnvProvider>
   );
 }
 

@@ -28,7 +28,7 @@ const Detail: FC<Props> = ({ id }) => {
         <h2 className="text-3xl tracking-tight text-gray-900">
           {listing.title}
         </h2>
-        <p className="text-sm text-gray-700 flex items-center gap-1">
+        <div className="text-sm text-gray-700 flex items-center gap-1">
           <div className="flex items-center">
             <StarIcon className="h-4 w-4" />
             {Math.round(listing.rating * 100) / 100}
@@ -37,7 +37,7 @@ const Detail: FC<Props> = ({ id }) => {
           27 reviews
           <span>·</span>
           {listing.location}
-        </p>
+        </div>
 
         <div className="mt-6 flex items-stretch gap-2">
           <div className="group relative min-w-0 w-1/2 h-96">

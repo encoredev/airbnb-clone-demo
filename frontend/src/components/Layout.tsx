@@ -8,6 +8,7 @@ import {
   XMarkIcon,
 } from "@heroicons/react/24/outline";
 import React, { FC, Fragment, PropsWithChildren, useState } from "react";
+import { EnvDropdown } from "../lib/env";
 
 function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(" ");
@@ -55,6 +56,10 @@ const Layout: FC<PropsWithChildren> = (props) => {
                           watermattress
                         </a>
                       </Link>
+                    </div>
+
+                    <div className="text-white">
+                      <EnvDropdown />
                     </div>
                   </div>
                 </div>

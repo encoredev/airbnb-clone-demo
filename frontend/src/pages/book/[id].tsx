@@ -6,7 +6,7 @@ import FirebaseAuthPage from "../../components/FirebaseAuthPage";
 import useFirebaseAuth from "../../components/FirebaseProvider";
 import { useDetailViewQuery } from "../../graphql";
 import Client, { Environment, Local } from "../../lib/client";
-import { auth } from "../../lib/fb";
+import { useEnv } from "../../lib/env";
 
 interface Props {
   listingID: number;
@@ -34,11 +34,16 @@ const Book: FC<Props> = ({ listingID, checkin, checkout, guests }) => {
   const checkinDate = parse(checkin, "y-M-d", new Date());
   const checkoutDate = parse(checkout, "y-M-d", new Date());
 
+  const { envName } = useEnv();
+
   const doBook = async () => {
     setLoading(true);
     try {
       const token = await authUser.user!.getIdToken(true);
-      const client = new Client(Environment("staging"), { auth: token });
+      const client = new Client(
+        envName === "local" ? Local : Environment(envName),
+        { auth: token }
+      );
       const resp = await client.booking.Initiate({
         listingID,
         checkin,

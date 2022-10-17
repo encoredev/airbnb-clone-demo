@@ -36,7 +36,7 @@ const Home: FC = () => {
                       </a>
                     </Link>
                   </h3>
-                  <p className="mt-1 text-sm text-gray-500">
+                  <div className="mt-1 text-sm text-gray-500">
                     <div>{listing.distanceKm} kilometers away</div>
                     <div>Oct 15 — 22 </div>
                     <div className="mt-1">
@@ -45,14 +45,14 @@ const Home: FC = () => {
                       </span>{" "}
                       night
                     </div>
-                  </p>
+                  </div>
                 </div>
-                <p className="text-sm font-medium text-gray-900">
+                <div className="text-sm font-medium text-gray-900">
                   <div className="flex items-center gap-1">
                     <StarIcon className="h-4 w-4" />
                     <span>{Math.round(listing.rating * 100) / 100}</span>
                   </div>
-                </p>
+                </div>
               </div>
             </div>
           ))}

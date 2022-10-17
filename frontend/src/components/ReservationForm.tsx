@@ -43,7 +43,7 @@ const ReservationForm: FC<{ listing: ListingSubset }> = ({ listing }) => {
               name="checkin"
               id="checkin"
               className="block w-full border-0 p-0 text-gray-900 placeholder-gray-500 focus:ring-0 sm:text-sm"
-              value={checkin}
+              defaultValue={checkin}
             />
           </div>
           <div className="w-1/2 min-w-0 flex-1 relative rounded-none rounded-tr-md border border-gray-300 px-3 py-2 focus-within:z-10 focus-within:border-indigo-600 focus-within:ring-1 focus-within:ring-indigo-600">
@@ -58,7 +58,7 @@ const ReservationForm: FC<{ listing: ListingSubset }> = ({ listing }) => {
               name="checkout"
               id="checkout"
               className="block w-full border-0 p-0 text-gray-900 placeholder-gray-500 focus:ring-0 sm:text-sm"
-              value={checkout}
+              defaultValue={checkout}
             />
           </div>
         </div>
@@ -74,7 +74,7 @@ const ReservationForm: FC<{ listing: ListingSubset }> = ({ listing }) => {
             id="guests"
             name="guests"
             className="relative block w-full border-0 p-0 text-gray-900 focus:z-10 sm:text-sm focus:border-none focus:ring-0"
-            value={guests}
+            defaultValue={guests}
           >
             <option value={1}>1 guest</option>
             <option value={2}>2 guests</option>
