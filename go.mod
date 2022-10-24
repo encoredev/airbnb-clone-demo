@@ -3,7 +3,7 @@ module encore.app
 go 1.18
 
 require (
-	encore.dev v1.7.1
+	encore.dev v1.9.0
 	firebase.google.com/go/v4 v4.9.0
 	github.com/99designs/gqlgen v0.17.20
 	github.com/google/go-cmp v0.5.8

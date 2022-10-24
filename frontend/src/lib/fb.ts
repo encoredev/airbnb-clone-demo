@@ -1,5 +1,5 @@
 import { initializeApp } from "firebase/app";
-import { getAuth } from "firebase/auth";
+import { connectAuthEmulator, getAuth } from "firebase/auth";
 
 const firebaseConfig = {
   apiKey: "AIzaSyC0lLjSHni7M27IVRckV0Apv_qdMuPMmaQ",
@@ -15,8 +15,8 @@ const fbApp = initializeApp(firebaseConfig);
 const auth = getAuth();
 
 // Connect to the Firebase emulator in development.
-// if (process.env.NODE_ENV === "development") {
-//   connectAuthEmulator(auth, "http://localhost:9099");
-// }
+if (process.env.NODE_ENV === "development") {
+  connectAuthEmulator(auth, "http://localhost:9099");
+}
 
 export { fbApp, auth };

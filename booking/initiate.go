@@ -47,8 +47,6 @@ func Initiate(ctx context.Context, p *InitiateParams) (*InitiateResponse, error)
 		return nil, fmt.Errorf("checkout before checkin")
 	}
 
-	// TODO check availability
-
 	var imageURLs []string
 	if len(listing.Pictures) > 0 {
 		imageURLs = []string{listing.Pictures[0]}

@@ -3,7 +3,7 @@ import sys
 import json
 import random
 
-BASE_URL = "https://pr8-airbnb-mkg2.encr.app"
+BASE_URL = "https://pr10-airbnb-mkg2.encr.app"
 
 for ln in sys.stdin.readlines():
     data = json.loads(ln)
