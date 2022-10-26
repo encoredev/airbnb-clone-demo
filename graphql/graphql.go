@@ -11,20 +11,28 @@ import (
 
 //go:generate go run github.com/99designs/gqlgen generate
 
-var (
-	srv     = handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: &Resolver{}}))
-	loaders = NewLoaders()
-)
+//encore:service
+type Service struct {
+	loaders    *Loaders
+	srv        *handler.Server
+	playground http.Handler
+}
+
+func initService() (*Service, error) {
+	loaders := NewLoaders()
+	srv := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: &Resolver{}}))
+	pg := playground.Handler("GraphQL Playground", "/graphql")
+	return &Service{loaders, srv, pg}, nil
+}
 
 //encore:api public raw path=/graphql
-func Query(w http.ResponseWriter, req *http.Request) {
-	ctx := context.WithValue(req.Context(), loadersKey, loaders)
+func (s *Service) Query(w http.ResponseWriter, req *http.Request) {
+	ctx := context.WithValue(req.Context(), loadersKey, s.loaders)
 	req = req.WithContext(ctx)
-	srv.ServeHTTP(w, req)
+	s.srv.ServeHTTP(w, req)
 }
 
 //encore:api public raw path=/graphql/playground
-func Playground(w http.ResponseWriter, req *http.Request) {
-	h := playground.Handler("GraphQL playground", "/graphql")
-	h.ServeHTTP(w, req)
+func (s *Service) Playground(w http.ResponseWriter, req *http.Request) {
+	s.playground.ServeHTTP(w, req)
 }

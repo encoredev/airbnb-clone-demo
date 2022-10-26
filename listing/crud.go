@@ -31,10 +31,21 @@ type ListResponse struct {
 
 // List returns all listings.
 //
-//encore:api auth method=GET path=/listing
+//encore:api public method=GET path=/listing
 func (s *Service) List(ctx context.Context) (*ListResponse, error) {
 	var listings []*Listing
 	if err := s.db.Order("created DESC").Find(&listings).Error; err != nil {
+		return nil, err
+	}
+	return &ListResponse{Listings: listings}, nil
+}
+
+// ListForUser returns all listings for a user.
+//
+//encore:api public method=GET path=/listing/user/:uid
+func (s *Service) ListForUser(ctx context.Context, uid string) (*ListResponse, error) {
+	var listings []*Listing
+	if err := s.db.Order("created DESC").Find(&listings, "host_uid = $1", uid).Error; err != nil {
 		return nil, err
 	}
 	return &ListResponse{Listings: listings}, nil

@@ -1,0 +1,1 @@
+Foo: UseFirebaseEmulator: false
