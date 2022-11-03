@@ -92,7 +92,3 @@ type CheckoutCompletedEvent struct {
 var CheckoutsCompleted = pubsub.NewTopic[*CheckoutCompletedEvent]("checkout-completed", pubsub.TopicConfig{
 	DeliveryGuarantee: pubsub.AtLeastOnce,
 })
-
-var MyOtherTopic = pubsub.NewTopic[*CheckoutCompletedEvent]("topic2", pubsub.TopicConfig{
-	DeliveryGuarantee: pubsub.AtLeastOnce,
-})
