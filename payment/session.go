@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"encore.dev"
-	"encore.dev/rlog"
 	"github.com/stripe/stripe-go/v73"
 	"github.com/stripe/stripe-go/v73/checkout/session"
 )
@@ -85,6 +84,5 @@ var secrets struct {
 }
 
 func init() {
-	rlog.Info("got api key", "key", secrets.StripeAPIKey)
 	stripe.Key = secrets.StripeAPIKey
 }
