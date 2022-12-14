@@ -15,10 +15,11 @@ import (
 )
 
 type InitiateParams struct {
-	ListingID int    `json:"listingID"`
-	Checkin   string `json:"checkin"`
-	Checkout  string `json:"checkout"`
-	Guests    int    `json:"guests"`
+	ListingID int `json:"listingID"`
+	// Checkin is the date to check in.
+	Checkin  string `json:"checkin"`
+	Checkout string `json:"checkout"`
+	Guests   int    `json:"guests"`
 }
 
 type InitiateResponse struct {

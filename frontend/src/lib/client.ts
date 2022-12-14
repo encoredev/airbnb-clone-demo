@@ -142,6 +142,7 @@ export namespace listing {
         location: string
         numBeds: number
         numBaths: number
+        superhost: boolean
         /**
          * Lat, Lng are the latitude and longitude of the home.
          */
@@ -183,15 +184,6 @@ export namespace listing {
         public async List(): Promise<ListResponse> {
             // Now make the actual call to the API
             const resp = await this.baseClient.callAPI("GET", `/listing`)
-            return await resp.json() as ListResponse
-        }
-
-        /**
-         * ListForUser returns all listings for a user.
-         */
-        public async ListForUser(uid: string): Promise<ListResponse> {
-            // Now make the actual call to the API
-            const resp = await this.baseClient.callAPI("GET", `/listing/user/${encodeURIComponent(uid)}`)
             return await resp.json() as ListResponse
         }
     }

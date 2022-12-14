@@ -11,7 +11,7 @@ query IndexView {
     }
 }
 
-query DetailView($id: Int!) {
+query DetailView($id: Int!, includeBlah: Boolean!) {
     getListing(id: $id) {
         id
         title
