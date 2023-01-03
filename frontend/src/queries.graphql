@@ -8,6 +8,7 @@ query IndexView {
         distanceKm
         rating
         pricePerNight
+        superhost
     }
 }
 
@@ -23,5 +24,6 @@ query DetailView($id: Int!, includeBlah: Boolean!) {
         pricePerNight
         numBeds
         numBaths
+        superhost
     }
 }

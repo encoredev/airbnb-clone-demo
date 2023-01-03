@@ -52,6 +52,11 @@ const Home: FC = () => {
                     <StarIcon className="h-4 w-4" />
                     <span>{Math.round(listing.rating * 100) / 100}</span>
                   </div>
+                  {listing.superhost && (
+                    <span className="mt-2 inline-flex items-center rounded-full bg-purple-100 px-2.5 py-0.5 text-xs font-medium text-purple-800">
+                      Superhost
+                    </span>
+                  )}
                 </div>
               </div>
             </div>

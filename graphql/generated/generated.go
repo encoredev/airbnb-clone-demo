@@ -67,6 +67,7 @@ type ComplexityRoot struct {
 		Pictures      func(childComplexity int) int
 		PricePerNight func(childComplexity int) int
 		Rating        func(childComplexity int) int
+		Superhost     func(childComplexity int) int
 		Tags          func(childComplexity int) int
 		Title         func(childComplexity int) int
 	}
@@ -222,6 +223,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Listing.Rating(childComplexity), true
 
+	case "Listing.superhost":
+		if e.complexity.Listing.Superhost == nil {
+			break
+		}
+
+		return e.complexity.Listing.Superhost(childComplexity), true
+
 	case "Listing.tags":
 		if e.complexity.Listing.Tags == nil {
 			break
@@ -355,6 +363,7 @@ type Listing {
   rating: Float!
   pricePerNight: Int!
   tags: [String!]
+  superhost: Boolean!
 }
 
 type Amenity {
@@ -1241,6 +1250,50 @@ func (ec *executionContext) fieldContext_Listing_tags(ctx context.Context, field
 	return fc, nil
 }
 
+func (ec *executionContext) _Listing_superhost(ctx context.Context, field graphql.CollectedField, obj *listing.Listing) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Listing_superhost(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Superhost, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Listing_superhost(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Listing",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Query_listings(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Query_listings(ctx, field)
 	if err != nil {
@@ -1304,6 +1357,8 @@ func (ec *executionContext) fieldContext_Query_listings(ctx context.Context, fie
 				return ec.fieldContext_Listing_pricePerNight(ctx, field)
 			case "tags":
 				return ec.fieldContext_Listing_tags(ctx, field)
+			case "superhost":
+				return ec.fieldContext_Listing_superhost(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Listing", field.Name)
 		},
@@ -1371,6 +1426,8 @@ func (ec *executionContext) fieldContext_Query_getListing(ctx context.Context, f
 				return ec.fieldContext_Listing_pricePerNight(ctx, field)
 			case "tags":
 				return ec.fieldContext_Listing_tags(ctx, field)
+			case "superhost":
+				return ec.fieldContext_Listing_superhost(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Listing", field.Name)
 		},
@@ -3656,6 +3713,13 @@ func (ec *executionContext) _Listing(ctx context.Context, sel ast.SelectionSet, 
 				return innerFunc(ctx)
 
 			})
+		case "superhost":
+
+			out.Values[i] = ec._Listing_superhost(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}

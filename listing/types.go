@@ -16,6 +16,7 @@ type Listing struct {
 	Location    string `json:"location"`
 	NumBeds     int    `json:"numBeds"`
 	NumBaths    int    `json:"numBaths"`
+	Superhost   bool   `json:"superhost"`
 	// Lat, Lng are the latitude and longitude of the home.
 	Lat           float64   `json:"lat"`
 	Lng           float64   `json:"lng"`

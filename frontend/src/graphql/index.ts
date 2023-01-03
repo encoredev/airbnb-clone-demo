@@ -37,6 +37,7 @@ export type Listing = {
   pictures: Array<Scalars['String']>;
   pricePerNight: Scalars['Int'];
   rating: Scalars['Float'];
+  superhost: Scalars['Boolean'];
   tags?: Maybe<Array<Scalars['String']>>;
   title: Scalars['String'];
 };
@@ -63,14 +64,14 @@ export type User = {
 export type IndexViewQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type IndexViewQuery = { __typename?: 'Query', listings: Array<{ __typename?: 'Listing', id: number, title: string, location: string, description: string, pictures: Array<string>, distanceKm: number, rating: number, pricePerNight: number }> };
+export type IndexViewQuery = { __typename?: 'Query', listings: Array<{ __typename?: 'Listing', id: number, title: string, location: string, description: string, pictures: Array<string>, distanceKm: number, rating: number, pricePerNight: number, superhost: boolean }> };
 
 export type DetailViewQueryVariables = Exact<{
   id: Scalars['Int'];
 }>;
 
 
-export type DetailViewQuery = { __typename?: 'Query', getListing?: { __typename?: 'Listing', id: number, title: string, location: string, description: string, pictures: Array<string>, distanceKm: number, rating: number, pricePerNight: number, numBeds: number, numBaths: number } | null };
+export type DetailViewQuery = { __typename?: 'Query', getListing?: { __typename?: 'Listing', id: number, title: string, location: string, description: string, pictures: Array<string>, distanceKm: number, rating: number, pricePerNight: number, numBeds: number, numBaths: number, superhost: boolean } | null };
 
 
 export const IndexViewDocument = gql`
@@ -84,6 +85,7 @@ export const IndexViewDocument = gql`
     distanceKm
     rating
     pricePerNight
+    superhost
   }
 }
     `;
@@ -104,6 +106,7 @@ export const DetailViewDocument = gql`
     pricePerNight
     numBeds
     numBaths
+    superhost
   }
 }
     `;
